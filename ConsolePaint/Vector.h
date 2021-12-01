@@ -9,7 +9,7 @@ public:
 	int X = 0;
 	int Y = 0;
 
-	Vector(int x, int y) :X(x), Y(y) {}
+	Vector(int x = 0, int y = 0) :X(x), Y(y) {}
 
 	Vector operator+(Vector& vec)
 	{
@@ -21,10 +21,10 @@ public:
 		return Vector(this->X + vec.X, this->Y + vec.Y);
 	}
 
-	Vector operator-(Vector& vec)
+	/*Vector operator-(Vector& vec)
 	{
 		return Vector(this->X - vec.X, this->Y - vec.Y);
-	}
+	}*/
 
 	Vector operator-(Vector vec)
 	{
@@ -55,6 +55,11 @@ public:
 	bool operator==(Vector const& vec) const
 	{
 		return X == vec.X && Y == vec.Y;
+	}
+
+	bool operator!=(Vector const& vec) const
+	{
+		return X != vec.X || Y != vec.Y;
 	}
 
 	bool operator()(Vector const& lhs, Vector const& rhs) const

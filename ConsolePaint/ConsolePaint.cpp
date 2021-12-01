@@ -8,12 +8,25 @@
 //i don't know why, but unless expicitly stated here linker just ignored the library
 #pragma comment(lib,"./pdcurses/pdcurses")
 
+
+struct MouseInfo
+{
+    bool button1 = true;
+
+    //location on the last update
+    Vector PreviousLocation;
+
+    MouseInfo() {}
+};
+
 struct Program 
 {
     Canvas* Canvas = nullptr;
     Brush* Brush = nullptr;
     bool working = true;
-    bool button1 = true;
+    MouseInfo mouseInfo;
+
+    Program(){}
 };
 
 int main()
@@ -32,7 +45,7 @@ int main()
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
 
     //program setup
-    Program prog = Program();
+    Program prog;
     prog.Canvas = new Canvas({ 100,100 });
     prog.Brush = new Brush();
     
@@ -45,22 +58,35 @@ int main()
             MEVENT mouseEvent;
             if (nc_getmouse(&mouseEvent) == OK)
             {
+                Vector mouseLoc = Vector{ mouseEvent.x, mouseEvent.y };
                 if (mouseEvent.bstate & BUTTON1_PRESSED)
                 {
-                    prog.button1 = true;
+                    prog.mouseInfo.button1 = true;
                     mvaddch(mouseEvent.y, mouseEvent.x, 'a');
                     prog.Brush->Apply(prog.Canvas, Vector{mouseEvent.x ,mouseEvent.y });
+                    prog.mouseInfo.PreviousLocation = Vector{ mouseEvent.x ,mouseEvent.y };
                     //catch mouse press start
                 }
                 if (mouseEvent.bstate & BUTTON1_RELEASED)
                 {
-                    prog.button1 = false;
+                    prog.mouseInfo.button1 = false;
                     mvaddch(mouseEvent.y, mouseEvent.x, 'a');
                     //catch mouse press end
                 }
-                if (prog.button1)
+                if (prog.mouseInfo.button1)
                 {
+                    //get difference beetween locations
+                    //and draw line beetween them
+
+                    
+                    Vector diff = mouseLoc - prog.mouseInfo.PreviousLocation;
+                    if (diff != Vector{ 0,0 })
+                    {
+                        prog.Canvas->Line(prog.mouseInfo.PreviousLocation, mouseLoc, 'a');
+                    }
                     mvaddch(mouseEvent.y, mouseEvent.x, 'a');
+
+                    prog.mouseInfo.PreviousLocation = mouseLoc;
                 }
                 
             }
